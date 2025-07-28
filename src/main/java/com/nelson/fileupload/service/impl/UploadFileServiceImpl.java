@@ -1,5 +1,7 @@
 package com.nelson.fileupload.service.impl;
 
+import com.nelson.fileupload.exception.FileUploadFailed;
+import com.nelson.fileupload.security.CustomUserDetailsService;
 import com.nelson.fileupload.service.UploadFileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,17 +29,26 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public String uploadFile(String key, byte[] content) {
-        System.out.println("print4");
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .build();
+                .bucket(bucketName)
+                .key(key)
+                .build();
 
-        System.out.println("print5");
-        System.out.println(putObjectRequest);
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
-        System.out.println("print6");
-        return String.format("%s/%s/%s", s3Client.serviceClientConfiguration().endpointProvider(), bucketName , key);
+        try {
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
+            String objectPath = s3Client.serviceClientConfiguration().endpointProvider() + "/" + bucketName + "/" + key;
+            log.info(CustomUserDetailsService.getCurrentUser() + " uploaded " + objectPath);
+            return objectPath;
+
+        } catch (Exception e) {
+            log.error("AWS access key: " + System.getenv("AWS_ACCESS_KEY_ID"));
+            log.error("S3 Region: " + s3Client.serviceClientConfiguration().region());
+            log.error("AWS Enpoint: " + s3Client);
+            log.error("putObjectRequest: " + putObjectRequest);
+            log.error("Content length: " + (content != null ? content.length : "null"));
+            log.error("Upload failed ", e);
+            throw new FileUploadFailed();
+        }
     }
 }

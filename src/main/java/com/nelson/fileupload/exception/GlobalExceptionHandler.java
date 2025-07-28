@@ -63,4 +63,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAccessDenied() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    @ExceptionHandler(FileUploadFailed.class)
+    public ResponseEntity<HttpStatus> handleFileUploadFailed() {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
 }

@@ -31,7 +31,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RandomPasswordGenerator randomPasswordGenerator;
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
     @Autowired
     public AuthenticationServiceImpl(UserRepository userRepository,
@@ -83,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         user.setUsername(username);
         String randomPassword = randomPasswordGenerator.generateRandomPassword(18);
-        logger.info("Created "+ user.getUsername() + " with password - " + randomPassword); // -> Logging the password because there is currently no way of sending it to the user (e.g. email service)
+        log.info("Created "+ user.getUsername() + " with password - " + randomPassword); // -> Logging the password because there is currently no way of sending it to the user (e.g. email service)
         user.setPassword(passwordEncoder.encode(randomPassword));
 
         userRepository.save(user);

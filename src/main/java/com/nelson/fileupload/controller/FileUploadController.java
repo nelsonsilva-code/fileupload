@@ -20,7 +20,6 @@ public class FileUploadController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        String url = uploadFileService.uploadFile(fileName, file.getBytes());
-        return ResponseEntity.ok(url);
+        return ResponseEntity.ok(uploadFileService.uploadFile(fileName, file.getBytes()));
     }
 }
