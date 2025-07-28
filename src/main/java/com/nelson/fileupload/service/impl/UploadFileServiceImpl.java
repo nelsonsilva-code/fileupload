@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
@@ -37,7 +38,12 @@ public class UploadFileServiceImpl implements UploadFileService {
 
         try {
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
-            String objectPath = s3Client.serviceClientConfiguration().endpointProvider() + "/" + bucketName + "/" + key;
+
+            String objectPath = s3Client.utilities().getUrl(GetUrlRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build()).toString();
+
             log.info(CustomUserDetailsService.getCurrentUser() + " uploaded " + objectPath);
             return objectPath;
 
